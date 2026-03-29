@@ -233,9 +233,6 @@
       background: var(--dark-700);
       border: 1px solid rgba(255,255,255,0.06);
       border-bottom: 1px solid rgba(0,0,0,0.5);
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
     }
 
     /* BOTTOM halves */
@@ -246,17 +243,19 @@
       background: var(--dark-800);
       border: 1px solid rgba(255,255,255,0.04);
       border-top: 1px solid rgba(0,0,0,0.5);
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
     }
 
-    /* The digit spans - full card height, clipped by half-height parent */
+    /* The digit spans - absolutely positioned full-height, clipped by half-height parent */
     .card-top span,
-    .card-flap-top span {
-      display: block;
+    .card-flap-top span,
+    .card-bottom span,
+    .card-flap-bottom span {
+      position: absolute;
+      left: 0;
+      right: 0;
       height: var(--card-h);
       line-height: var(--card-h);
+      text-align: center;
       font-family: 'JetBrains Mono', monospace;
       font-size: var(--card-font);
       font-weight: 500;
@@ -264,18 +263,17 @@
       user-select: none;
     }
 
+    /* Top halves: span anchored at top → overflow hidden clips the bottom */
+    .card-top span,
+    .card-flap-top span {
+      top: 0;
+    }
+
+    /* Bottom halves: span offset upward by half card height → overflow hidden shows only lower half */
     .card-bottom span,
     .card-flap-bottom span {
-      display: block;
-      height: var(--card-h);
-      line-height: var(--card-h);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: var(--card-font);
-      font-weight: 500;
+      top: calc(-1 * var(--card-h) / 2);
       color: var(--dark-200);
-      /* offset upward so the bottom half of the digit aligns */
-      margin-top: calc(var(--card-h) / -2);
-      user-select: none;
     }
 
     /* Center fold shadow line */
