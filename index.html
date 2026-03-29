@@ -34,11 +34,6 @@
 
       --border:    rgba(255,255,255,0.06);
       --border-h:  rgba(255,255,255,0.10);
-
-      /* Flip card dimensions */
-      --card-w: 64px;
-      --card-h: 88px;
-      --card-font: 3rem;
     }
 
     html { scroll-behavior: smooth; }
@@ -167,159 +162,112 @@
 
     /* ─── FLIP CLOCK ──────────────────────────────────────── */
     .flip-clock {
+      text-align: center;
+      perspective: 400px;
+      margin: 0 auto;
       display: flex;
       align-items: flex-start;
-      gap: 0;
     }
 
-    .flip-unit {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
+    .flip-clock__piece {
+      display: inline-block;
+      margin: 0 8px;
     }
 
-    .flip-digits {
-      display: flex;
-      gap: 4px;
-    }
-
-    .flip-sep {
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
-      height: var(--card-h);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 2rem;
-      font-weight: 500;
-      color: var(--dark-600);
-      line-height: 1;
-      padding-bottom: 4px; /* optical alignment */
-    }
-
-    .flip-label {
+    .flip-clock__slot {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.6rem;
       font-weight: 500;
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--dark-500);
+      display: block;
+      text-align: center;
+      margin-top: 10px;
     }
 
-    /* ─── FLIP DIGIT CARD ─────────────────────────────────── */
-    .flip-digit {
+    .card {
+      display: block;
       position: relative;
-      width: var(--card-w);
-      height: var(--card-h);
-      perspective: 400px;
+      padding-bottom: 0.72em;
+      font-size: clamp(2.6rem, 6vw, 4.5rem);
+      line-height: 0.95;
     }
 
-    /* All four half-containers */
-    .card-top,
-    .card-bottom,
-    .card-flap-top,
-    .card-flap-bottom {
+    .card__top,
+    .card__bottom,
+    .card__back::before,
+    .card__back::after {
+      display: block;
+      height: 0.72em;
+      color: var(--dark-200);
+      background: var(--dark-700);
+      padding: 0.25em 0.25em;
+      border-radius: 0.15em 0.15em 0 0;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      width: 1.8em;
+      transform: translateZ(0);
+    }
+
+    .card__bottom {
+      color: var(--dark-100);
       position: absolute;
+      top: 50%;
       left: 0;
-      width: 100%;
-      height: 50%;
+      border-top: solid 1px rgba(0,0,0,0.5);
+      background: var(--dark-800);
+      border-radius: 0 0 0.15em 0.15em;
+      pointer-events: none;
       overflow: hidden;
     }
 
-    /* TOP halves */
-    .card-top,
-    .card-flap-top {
-      top: 0;
-      border-radius: 7px 7px 2px 2px;
-      background: var(--dark-700);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-bottom: 1px solid rgba(0,0,0,0.5);
+    .card__bottom::after {
+      display: block;
+      margin-top: -0.72em;
     }
 
-    /* BOTTOM halves */
-    .card-bottom,
-    .card-flap-bottom {
-      bottom: 0;
-      border-radius: 2px 2px 7px 7px;
-      background: var(--dark-800);
-      border: 1px solid rgba(255,255,255,0.04);
-      border-top: 1px solid rgba(0,0,0,0.5);
+    .card__back::before,
+    .card__bottom::after {
+      content: attr(data-value);
     }
 
-    /* Digit spans: full card height, flex-centered so the digit
-       sits with its midpoint exactly at the container's edge */
-    .card-top span,
-    .card-flap-top span,
-    .card-bottom span,
-    .card-flap-bottom span {
+    .card__back {
       position: absolute;
+      top: 0;
+      height: 100%;
       left: 0;
-      right: 0;
-      width: 100%;
-      height: var(--card-h);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: var(--card-font);
-      font-weight: 500;
-      user-select: none;
-    }
-
-    /* Top span anchored at top → digit center lands at fold → upper half visible */
-    .card-top span,
-    .card-flap-top span {
-      top: 0;
-      color: var(--dark-100);
-    }
-
-    /* Bottom span anchored at bottom → digit center lands at fold → lower half visible */
-    .card-bottom span,
-    .card-flap-bottom span {
-      bottom: 0;
-      color: var(--dark-200);
-    }
-
-    /* Center fold shadow line */
-    .card-fold {
-      position: absolute;
-      top: calc(50% - 1px);
-      left: 0; right: 0;
-      height: 2px;
-      background: rgba(0,0,0,0.7);
-      z-index: 10;
       pointer-events: none;
     }
 
-    /* ─── ANIMATED FLAPS ──────────────────────────────────── */
-    .card-flap-top {
-      transform-origin: bottom center;
-      z-index: 3;
+    .card__back::before {
+      position: relative;
+      z-index: -1;
+      overflow: hidden;
     }
 
-    .card-flap-bottom {
-      transform-origin: top center;
-      z-index: 3;
-      transform: rotateX(90deg); /* hidden by default */
+    .flip .card__back::before {
+      animation: flipTop 0.3s cubic-bezier(.37,.01,.94,.35);
+      animation-fill-mode: both;
+      transform-origin: center bottom;
     }
 
-    /* Animate when .flip class is added */
-    .flip-digit.flip .card-flap-top {
-      animation: flapTop 0.28s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+    .flip .card__back .card__bottom {
+      transform-origin: center top;
+      animation-fill-mode: both;
+      animation: flipBottom 0.6s cubic-bezier(.15,.45,.28,1);
     }
 
-    .flip-digit.flip .card-flap-bottom {
-      animation: flapBottom 0.28s cubic-bezier(0, 0.55, 0.45, 1) 0.28s forwards;
+    @keyframes flipTop {
+      0%   { transform: rotateX(0deg); z-index: 2; }
+      0%, 99% { opacity: 0.99; }
+      100% { transform: rotateX(-90deg); opacity: 0; }
     }
 
-    @keyframes flapTop {
-      0%   { transform: rotateX(0deg); }
-      100% { transform: rotateX(-90deg); }
-    }
-
-    @keyframes flapBottom {
-      0%   { transform: rotateX(90deg); }
-      100% { transform: rotateX(0deg); }
+    @keyframes flipBottom {
+      0%, 50% { z-index: -1; transform: rotateX(90deg); opacity: 0; }
+      51%      { opacity: 0.99; }
+      100%     { opacity: 0.99; transform: rotateX(0deg); z-index: 5; }
     }
 
     /* ─── FOOTER ──────────────────────────────────────────── */
@@ -351,29 +299,14 @@
     /* ─── RESPONSIVE ──────────────────────────────────────── */
     @media (max-width: 640px) {
       nav { padding: 0 1.25rem; }
-
-      :root {
-        --card-w: 46px;
-        --card-h: 66px;
-        --card-font: 2.2rem;
-      }
-
-      .flip-sep {
-        padding: 0 6px;
-        font-size: 1.5rem;
-      }
-
+      .card { font-size: clamp(2rem, 8vw, 3rem); }
+      .flip-clock__piece { margin: 0 4px; }
       footer { justify-content: center; text-align: center; }
     }
 
     @media (max-width: 380px) {
-      :root {
-        --card-w: 38px;
-        --card-h: 56px;
-        --card-font: 1.8rem;
-      }
-
-      .flip-sep { padding: 0 4px; font-size: 1.2rem; }
+      .card { font-size: 1.8rem; }
+      .flip-clock__piece { margin: 0 2px; }
     }
   </style>
 </head>
@@ -427,39 +360,7 @@
     </p>
 
     <!-- FLIP CLOCK -->
-    <div class="flip-clock" id="clock" aria-label="Countdown timer" role="timer">
-
-      <!-- DAYS -->
-      <div class="flip-unit">
-        <div class="flip-digits" id="unit-days"></div>
-        <span class="flip-label">Days</span>
-      </div>
-
-      <div class="flip-sep" aria-hidden="true">:</div>
-
-      <!-- HOURS -->
-      <div class="flip-unit">
-        <div class="flip-digits" id="unit-hours"></div>
-        <span class="flip-label">Hrs</span>
-      </div>
-
-      <div class="flip-sep" aria-hidden="true">:</div>
-
-      <!-- MINUTES -->
-      <div class="flip-unit">
-        <div class="flip-digits" id="unit-minutes"></div>
-        <span class="flip-label">Min</span>
-      </div>
-
-      <div class="flip-sep" aria-hidden="true">:</div>
-
-      <!-- SECONDS -->
-      <div class="flip-unit">
-        <div class="flip-digits" id="unit-seconds"></div>
-        <span class="flip-label">Sec</span>
-      </div>
-
-    </div>
+    <div id="clock-container" aria-label="Countdown timer" role="timer"></div>
   </main>
 
   <!-- FOOTER -->
@@ -470,94 +371,89 @@
 
   <script>
     // ── CONFIG ────────────────────────────────────────────────
-    // Change this to your actual launch date/time (ISO 8601, local time)
-    const TARGET_DATE = new Date('2026-05-01T00:00:00');
+    var TARGET_DATE = '2026-05-01T00:00:00';
 
-    // ── DIGIT CARD ────────────────────────────────────────────
-    function createDigitCard() {
-      const el = document.createElement('div');
-      el.className = 'flip-digit';
-      el.innerHTML = `
-        <div class="card-top"><span></span></div>
-        <div class="card-bottom"><span></span></div>
-        <div class="card-flap-top"><span></span></div>
-        <div class="card-flap-bottom"><span></span></div>
-        <div class="card-fold"></div>
-      `;
-      el._current = null;
-      el._animating = false;
-      return el;
+    // ── FLIP CLOCK (logic from iannuttall/b272ced6fb8affaed867e5f3971720fa) ──
+    function CountdownTracker(label, value) {
+      var el = document.createElement('span');
+      el.className = 'flip-clock__piece';
+      el.innerHTML =
+        '<b class="flip-clock__card card">' +
+          '<b class="card__top"></b>' +
+          '<b class="card__bottom"></b>' +
+          '<b class="card__back"><b class="card__bottom"></b></b>' +
+        '</b>' +
+        '<span class="flip-clock__slot">' + label + '</span>';
+      this.el = el;
+
+      var top       = el.querySelector('.card__top'),
+          bottom    = el.querySelector('.card__bottom'),
+          back      = el.querySelector('.card__back'),
+          backBottom = el.querySelector('.card__back .card__bottom');
+
+      this.update = function(val) {
+        val = ('0' + val).slice(-2);
+        if (val !== this.currentValue) {
+          if (this.currentValue >= 0) {
+            back.setAttribute('data-value', this.currentValue);
+            bottom.setAttribute('data-value', this.currentValue);
+          }
+          this.currentValue = val;
+          top.innerText = this.currentValue;
+          backBottom.setAttribute('data-value', this.currentValue);
+          this.el.classList.remove('flip');
+          void this.el.offsetWidth;
+          this.el.classList.add('flip');
+        }
+      };
+      this.update(value);
     }
 
-    function setDigit(card, newChar) {
-      if (card._current === newChar) return;
-
-      const oldChar = card._current;
-      card._current = newChar;
-
-      // Update static visible card immediately (shows through when flap lifts)
-      card.querySelector('.card-top span').textContent = newChar;
-      card.querySelector('.card-bottom span').textContent = newChar;
-
-      if (oldChar === null) return; // initial render - no animation
-
-      // Set flap content: top flap shows old value flying away, bottom flap shows new value arriving
-      card.querySelector('.card-flap-top span').textContent = oldChar;
-      card.querySelector('.card-flap-bottom span').textContent = newChar;
-
-      // Restart animation
-      card.classList.remove('flip');
-      void card.offsetWidth; // force reflow
-      card.classList.add('flip');
-
-      // Clean up class after animation completes
-      setTimeout(() => card.classList.remove('flip'), 700);
+    function getTimeRemaining(endtime) {
+      var t = Date.parse(endtime) - Date.parse(new Date());
+      return {
+        'Total':   t,
+        'Days':    Math.floor(t / (1000 * 60 * 60 * 24)),
+        'Hours':   Math.floor((t / (1000 * 60 * 60)) % 24),
+        'Minutes': Math.floor((t / 1000 / 60) % 60),
+        'Seconds': Math.floor((t / 1000) % 60)
+      };
     }
 
-    // ── UNIT BUILDER ─────────────────────────────────────────
-    function buildUnit(containerId, numDigits) {
-      const container = document.getElementById(containerId);
-      const cards = [];
-      for (let i = 0; i < numDigits; i++) {
-        const card = createDigitCard();
-        container.appendChild(card);
-        cards.push(card);
+    function Clock(countdown, callback) {
+      countdown = countdown ? new Date(Date.parse(countdown)) : false;
+      callback  = callback || function() {};
+      var updateFn = getTimeRemaining;
+      this.el = document.createElement('div');
+      this.el.className = 'flip-clock';
+
+      var trackers = {},
+          t = updateFn(countdown),
+          key, timeinterval;
+
+      for (key in t) {
+        if (key === 'Total') { continue; }
+        trackers[key] = new CountdownTracker(key, t[key]);
+        this.el.appendChild(trackers[key].el);
       }
-      return cards;
-    }
 
-    function updateUnit(cards, value, digits) {
-      const str = String(Math.max(0, value)).padStart(digits, '0').slice(-digits);
-      for (let i = 0; i < digits; i++) {
-        setDigit(cards[i], str[i]);
+      function updateClock() {
+        timeinterval = requestAnimationFrame(updateClock);
+        var now = updateFn(countdown);
+        if (now.Total < 0) {
+          cancelAnimationFrame(timeinterval);
+          for (key in trackers) { trackers[key].update(0); }
+          callback();
+          return;
+        }
+        for (key in trackers) { trackers[key].update(now[key]); }
       }
+      setTimeout(updateClock, 500);
     }
 
     // ── INIT ─────────────────────────────────────────────────
-    const daysCards    = buildUnit('unit-days',    3);
-    const hoursCards   = buildUnit('unit-hours',   2);
-    const minutesCards = buildUnit('unit-minutes', 2);
-    const secondsCards = buildUnit('unit-seconds', 2);
-
-    function tick() {
-      const now  = Date.now();
-      const diff = Math.max(0, TARGET_DATE.getTime() - now);
-
-      const totalSecs = Math.floor(diff / 1000);
-      const secs  = totalSecs % 60;
-      const mins  = Math.floor(totalSecs / 60) % 60;
-      const hours = Math.floor(totalSecs / 3600) % 24;
-      const days  = Math.floor(totalSecs / 86400);
-
-      updateUnit(daysCards,    days,  3);
-      updateUnit(hoursCards,   hours, 2);
-      updateUnit(minutesCards, mins,  2);
-      updateUnit(secondsCards, secs,  2);
-    }
-
-    // Render immediately, then every second
-    tick();
-    setInterval(tick, 1000);
+    var clock = new Clock(TARGET_DATE);
+    document.getElementById('clock-container').appendChild(clock.el);
   </script>
 
 </body>
